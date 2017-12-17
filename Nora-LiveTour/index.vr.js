@@ -11,7 +11,7 @@ export default class Nora_LiveTour extends React.Component {
   render() {
     return (
       <View>
-        <Pano source={asset('pano_ex1.jpg')}/>
+        <Pano source={asset('IMG_0440.jpg')}/>
         <Text
           style={{
             backgroundColor: '#777879',
