@@ -1,0 +1,18 @@
+{
+  "name":"Nora VR Test",
+	"defaults":{
+		"infos":{
+			"icon":"nora-logo.png"
+		}
+	},
+	"firstSceneId":"Kitchen",
+	"scenes":[
+		{
+			"id":"Kitchen",
+			"photopanos":[
+				{"src":"IMG_0440.jpg","rotateY":200}
+			],
+			"navs":[
+				{"to":"pano_ex1","txt":"pano_ex1","rotateY":225}
+			],
+		},
