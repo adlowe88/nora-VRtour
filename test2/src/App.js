@@ -14,8 +14,8 @@ export default class App extends React.Component {
   }
 
   changeScene() {
-    console.log('clicked');
-    this.setState = ({
+    console.log('before click', this.state);
+    this.setState({
       background: 'outside.jpeg',
       visible: false
     });
@@ -47,7 +47,7 @@ export default class App extends React.Component {
             My Office
           </Text>
         </VrButton>
-        { this.renderItems() }
+          { this.renderItems() }
         <Primitives />
       </View>
     );
