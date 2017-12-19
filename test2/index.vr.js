@@ -6,6 +6,16 @@ import {
 import App from './src/App';
 
 export default class test2 extends React.Component {
+  constructor(props) {
+   super(props);
+   this.state = {
+     data: null,
+     locationId: null,
+     nextLocationId: null,
+     rotation: null,
+   };
+ }
+
   render() {
     return (
       <View>
@@ -14,5 +24,11 @@ export default class test2 extends React.Component {
     );
   }
 };
+
+class Tour extends React.Component {
+  Static defaultProps = {
+    tourSrc: "data.json",
+  }
+}
 
 AppRegistry.registerComponent('test2', () => test2);
