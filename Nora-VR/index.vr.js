@@ -1,46 +1,24 @@
-/**
- * The examples provided by Oculus are for non-commercial testing and
- * evaluation purposes only.
- *
- * Oculus reserves all rights not expressly granted.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL
- * OCULUS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
- * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * Example ReactVR app that allows a simple tour using linked 360 photos.
- */
-'use strict';
-
-import React from 'react';
+import React, { PureComponent as Component } from 'react';
 import {AppRegistry, asset, Image, Pano, Text, Sound, View} from 'react-vr';
 
 import InfoButton from './InfoButton';
 import NavButton from './NavButton';
-import LoadingSpinner from './LoadingSpinner';
 
 import CylindricalPanel from 'CylindricalPanel';
 
 // Web VR is only able to support a maxiumum texture resolution of 4096 px
 const MAX_TEXTURE_WIDTH = 4096;
 const MAX_TEXTURE_HEIGHT = 720;
+
 // Cylinder is a 2D surface a fixed distance from the camera.
 // It uses pixes instead of meters for positioning components.
 // pixels = degrees/360 * density, negative to rotate in expected direction.
 const degreesToPixels = degrees => -(degrees / 360) * MAX_TEXTURE_WIDTH;
-// PPM = 1/(2*PI*Radius) * density. Radius of cylinder is 3 meters.
+
+// PPM = 1/(2*PI*Radius) * density where r = 3
 const PPM = 1 / (2 * Math.PI * 3) * MAX_TEXTURE_WIDTH;
 
-/**
- * ReactVR component that allows a simple tour using linked 360 photos.
- * Tour includes nav buttons, activated by gaze-and-fill or direct selection,
- * that move between tour locations and info buttons that display tooltips with
- * text and/or images. Tooltip data and photo URLs are read from a JSON file.
- */
-class Nora_VR extends React.Component {
+class Nora_VR extends Component {
   static defaultProps = {
     tourSource: 'noraTour.json',
   };
@@ -55,6 +33,8 @@ class Nora_VR extends React.Component {
     };
   }
 
+
+  //Call to get data from json file AFTER the initial render ie. client side
   componentDidMount() {
     fetch(asset(this.props.tourSource).uri)
       .then(response => response.json())
@@ -64,8 +44,8 @@ class Nora_VR extends React.Component {
       .done();
   }
 
+  // Initialize the tour based on data file.
   init(tourConfig) {
-    // Initialize the tour based on data file.
     this.setState({
       data: tourConfig,
       locationId: null,
@@ -91,12 +71,13 @@ class Nora_VR extends React.Component {
       <View>
         <View style={{transform: [{rotateY: rotation}]}}>
           <Pano
-            // Place pano in world, and by using position absolute it does not
-            // contribute to the layout of other views.
+            // Absolute positioning as to not affect other elements
+            // NB REACT VR USES FLEXBOX STYLE LAYOUT (everything needs abosolute positioning)
             style={{
               position: 'absolute',
               tintColor: isLoading ? 'grey' : 'white',
             }}
+
             onLoad={() => {
               const data = this.state.data;
               this.setState({
@@ -106,7 +87,10 @@ class Nora_VR extends React.Component {
             }}
             source={asset(this.state.data.photos[this.state.nextLocationId].uri)}
           />
+
           <CylindricalPanel
+            // Component to draw children to the inner surface of a cylinder
+            // for rendering 2D content in a 3D environment
             layer={{
               width: MAX_TEXTURE_WIDTH,
               height: MAX_TEXTURE_HEIGHT,
@@ -115,19 +99,17 @@ class Nora_VR extends React.Component {
             style={{position: 'absolute'}}>
             <View
               style={{
-                // View covering the cyldiner. Center so contents appear in middle of cylinder.
+                // View covering the cyldiner
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: MAX_TEXTURE_WIDTH,
                 height: MAX_TEXTURE_HEIGHT,
               }}>
-              {/* Need container view, else using absolute position on buttons removes them from cylinder */}
               <View>
                 {tooltips &&
                   tooltips.map((tooltip, index) => {
-                    // Iterate through items related to this location, creating either
-                    // info buttons, which show tooltip on hover, or nav buttons, which
-                    // change the current location in the tour.
+                    //Need a container view otherwise absolute positioning displaces them from cylinder
+                    // Iterate through photos/tooltips related to this location, creating nav buttons
                     return (
                       <NavButton
                         key={tooltip.linkedPhotoId}
@@ -147,14 +129,6 @@ class Nora_VR extends React.Component {
                       />
                     );
                   })}
-                {locationId == null &&
-                  // Show a spinner while first pano is loading.
-                  <LoadingSpinner
-                    style={{layoutOrigin: [0.5, 0.5]}}
-                    pixelsPerMeter={PPM}
-                    // Undo the rotation so spinner is centered
-                    translateX={degreesToPixels(rotation) * -1}
-                  />}
               </View>
             </View>
           </CylindricalPanel>
