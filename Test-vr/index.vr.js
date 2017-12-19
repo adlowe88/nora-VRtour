@@ -4,14 +4,14 @@ import {
   View,
 } from 'react-vr';
 import Canvas from './components/Canvas';
+import UI from './components/UI';
 
 //Config object defining the relation between the epuirectangular images,
 // the button image, and the actual buttons
-//The UI component will use the value defined here to handle events
 const Config = [
   {
     key: 0,
-    imageSrc: 'test1.jpg',
+    imageSrc: 'test1.JPG',
     buttonImageSrc: 'button-00.png',
   },
   {
@@ -32,23 +32,29 @@ const Config = [
 ];
 
 
-
-
-
 export default class Test_vr extends React.Component {
   constructor () {
     super();
     this.state = {
-      src: "test1.jpg"
+      src: "equi1.jpg"
     }
   }
 
   render() {
     return (
       <View>
+
         <Canvas
            src={this.state.src}
          />
+
+         <UI
+          buttonConfig = { Config }
+          onClick = { ( key ) => {
+            this.setState ({ src: Config[key].imageSrc });
+          }}
+         />
+
       </View>
     );
   }

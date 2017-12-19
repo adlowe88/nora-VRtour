@@ -1,37 +1,42 @@
-import React, { PureComponent as Component } from 'react';
-
+import React from 'react';
 import {
   asset,
   Image,
   View,
   VrButton,
-}, from 'react-vr';
+} from 'react-vr';
 
+class Button extends React.Component {
 
-//<Image> Props to add our asset images sto each button (<VrButton> has no default style),
-//<VrButton> makes use of the event listener onClick
-class Button extends Component {
+  onButtonClick = () => {
+    this.props.onClick();
+  }
+
   render () {
     return (
       <View
-        style = {{
+        style={{
+          alignItems: 'center',
+          flexDirection: 'row',
+          margin: 0.0125,
+          width: 0.7,
         }}
       >
         <VrButton
-          onClick = { this.onButtonClick }
+          onClick={this.onButtonClick}
         >
           <Image
-            style = {{
-              width: 1,
-              height: 1,
+            style={{
+              width: 0.7,
+              height: 0.7,
             }}
-            source = { asset( this.props.src ) }
+            source={asset(this.props.src)}
           >
           </Image>
         </VrButton>
       </View>
     );
   }
-}
+};
 
 export default Button;

@@ -5,7 +5,6 @@ import {
 } from 'react-vr';
 
 class Canvas extends Component {
-
   constructor(props) {
     super(props);
 
@@ -16,7 +15,10 @@ class Canvas extends Component {
 
   render() {
     return (
-      <Pano source={asset(this.state.src)}/>
+      <Pano
+        source={asset(this.state.src)}
+        }}
+      />
     );
   }
 };
