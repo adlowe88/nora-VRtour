@@ -1,28 +1,51 @@
-import React from 'react';
-import {
-  AppRegistry,
-  asset,
-  Pano,
-  Text,
-  View,
-} from 'react-vr';
+/**
+ * The examples provided by Oculus are for non-commercial testing and
+ * evaluation purposes only.
+ *
+ * Oculus reserves all rights not expressly granted.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL
+ * OCULUS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ * Example ReactVR app that allows a simple tour using linked 360 photos.
+ */
+'use strict';
 
-//max possible for rendering in web pages
+import React from 'react';
+import {AppRegistry, asset, Image, Pano, Text, Sound, View} from 'react-vr';
+
+import InfoButton from './InfoButton';
+import NavButton from './NavButton';
+import LoadingSpinner from './LoadingSpinner';
+
+import CylindricalPanel from 'CylindricalPanel';
+
+// Web VR is only able to support a maxiumum texture resolution of 4096 px
 const MAX_TEXTURE_WIDTH = 4096;
 const MAX_TEXTURE_HEIGHT = 720;
-
+// Cylinder is a 2D surface a fixed distance from the camera.
+// It uses pixes instead of meters for positioning components.
 // pixels = degrees/360 * density, negative to rotate in expected direction.
 const degreesToPixels = degrees => -(degrees / 360) * MAX_TEXTURE_WIDTH;
 // PPM = 1/(2*PI*Radius) * density. Radius of cylinder is 3 meters.
 const PPM = 1 / (2 * Math.PI * 3) * MAX_TEXTURE_WIDTH;
 
-export default class Nora_VR extends React.Component {
-  //for underfined props (but not null)
+/**
+ * ReactVR component that allows a simple tour using linked 360 photos.
+ * Tour includes nav buttons, activated by gaze-and-fill or direct selection,
+ * that move between tour locations and info buttons that display tooltips with
+ * text and/or images. Tooltip data and photo URLs are read from a JSON file.
+ */
+class Nora_VR extends React.Component {
   static defaultProps = {
-    src: 'equi1.jpg',
+    tourSource: 'noraTour.json',
   };
 
-  constructor (props) {
+  constructor(props) {
     super(props);
     this.state = {
       data: null,
@@ -32,12 +55,8 @@ export default class Nora_VR extends React.Component {
     };
   }
 
-  //invoked immediately after component mount
-  //Starting AJAX calls to load in data for your component.
-  //load data from remoate endpoint, can't guarentee AJAX requests will resolve
-  //before component mounts; guarentee that component is up to date before trying to setState
   componentDidMount() {
-    fetch(asset(this.props.src).uri)
+    fetch(asset(this.props.tourSource).uri)
       .then(response => response.json())
       .then(responseData => {
         this.init(responseData);
@@ -45,38 +64,35 @@ export default class Nora_VR extends React.Component {
       .done();
   }
 
-  //Initialize the tour with the data config file
-  init(config) {
+  init(tourConfig) {
+    // Initialize the tour based on data file.
     this.setState({
-      data: config,
+      data: tourConfig,
       locationId: null,
-      nextLocationId: config.firstPhotoId,
-      rotation: config.firstPhotoRotation +
-        ( config.photos[config.firstPhotoId].rotationOffSet || 0 ),
+      nextLocationId: tourConfig.firstPhotoId,
+      rotation: tourConfig.firstPhotoRotation +
+        (tourConfig.photos[tourConfig.firstPhotoId].rotationOffset || 0),
     });
   }
 
   render() {
-    if(!this.state.data) {
+    if (!this.state.data) {
       return null;
     }
-    //Set start scene
+
     const locationId = this.state.locationId;
-    //image info for starting scene
     const photoData = (locationId && this.state.data.photos[locationId]) || null;
-    //nav buttons, tooltips
     const tooltips = (photoData && photoData.tooltips) || null;
     const rotation =
-      this.state.data.firstPhotoRotation +
-        ((photoData && photoData.rotationOffset) || 0);
-    //need to load next scene?
+      this.state.data.firstPhotoRotation + ((photoData && photoData.rotationOffset) || 0);
     const isLoading = this.state.nextLocationId !== this.state.locationId;
 
     return (
       <View>
         <View style={{transform: [{rotateY: rotation}]}}>
           <Pano
-            //absoulte to overcome re-positioning within the flexbox style layout
+            // Place pano in world, and by using position absolute it does not
+            // contribute to the layout of other views.
             style={{
               position: 'absolute',
               tintColor: isLoading ? 'grey' : 'white',
@@ -84,15 +100,12 @@ export default class Nora_VR extends React.Component {
             onLoad={() => {
               const data = this.state.data;
               this.setState({
-                //update locationId
+                // Now that ths new photo is loaded, update the locationId.
                 locationId: this.state.nextLocationId,
               });
             }}
-            //set the source of the new scene
             source={asset(this.state.data.photos[this.state.nextLocationId].uri)}
           />
-          //To draw the child components to the inner surface of a cylinder
-          //rendering flat 2d content in a 3d space
           <CylindricalPanel
             layer={{
               width: MAX_TEXTURE_WIDTH,
@@ -112,7 +125,8 @@ export default class Nora_VR extends React.Component {
               <View>
                 {tooltips &&
                   tooltips.map((tooltip, index) => {
-                    // Iterate through items related to this location, creating  nav buttons which
+                    // Iterate through items related to this location, creating either
+                    // info buttons, which show tooltip on hover, or nav buttons, which
                     // change the current location in the tour.
                     return (
                       <NavButton
@@ -148,6 +162,8 @@ export default class Nora_VR extends React.Component {
       </View>
     );
   }
-};
+}
 
+// Name used to create module, via reactNativeContext.createRootView('TourSample')
 AppRegistry.registerComponent('Nora_VR', () => Nora_VR);
+module.exports = Nora_VR;
