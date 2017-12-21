@@ -1,36 +1,46 @@
 {
    "nav_icon": "nora-logo.png",
-   "firstPhotoId":"111",
+   "firstPhotoId":"222",
    "firstPhotoRotation":150,
    "photos":{
       "222":{
          "rotationOffset": 0,
-         "uri":"equi1.jpg",
+         "uri":"first.jpeg",
          "tooltips":[
             {
                "text":"Office",
-               "rotationY": -9.929,
+               "rotationY": 44.929,
+               "translateZ": -2,
                "linkedPhotoId":"111"
+            },
+            {
+               "text":"Dining",
+               "width": 0.020,
+               "height": 0.388,
+               "rotationY": 113.8,
+               "linkedPhotoId":"333"
             }
          ]
       },
       "111":{
          "rotationOffset": -150,
-         "uri":"background.jpeg",
+         "uri":"livingroom.jpeg",
          "tooltips":[
             {
-               "text":"Grand Canyon",
-               "rotationY": -64.525,
+               "text":"Second Floor",
+               "width": 0.020,
+               "height": 0.388,
+               "rotationY": -39,
                "linkedPhotoId":"222"
             }
          ]
       },
       "333":{
          "rotationOffset": -30,
-         "uri":"outside.jpeg",
+         "uri":"dining.jpeg",
          "tooltips":[
             {
-               "text":"Equil1",
+               "text":"Second Floor",
                "rotationY": 117.441,
                "linkedPhotoId":"222"
             }
